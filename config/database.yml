@@ -1,13 +1,6 @@
 default: &default
-  adapter: mysql2
-  encoding: utf8
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
   pool: 5
-  username: root
-
-development:
-  <<: *default
-  database: message_system_dev
-
-test: &test
-  <<: *default
-  database: message_system_test
