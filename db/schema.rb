@@ -10,7 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160909053859) do
+ActiveRecord::Schema.define(version: 20160909061242) do
+
+  create_table "contacts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_id"
+    t.string   "target_email"
+    t.integer  "conversation_id"
+    t.datetime "last_touch_at"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["user_id", "conversation_id"], name: "index_contacts_on_user_id_and_conversation_id", unique: true, using: :btree
+    t.index ["user_id", "target_email"], name: "index_contacts_on_user_id_and_target_email", unique: true, using: :btree
+  end
+
+  create_table "conversations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "user_one_id"
+    t.integer  "user_other_id"
+    t.integer  "unread_count",       default: 0
+    t.integer  "last_reply_user_id"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.index ["user_one_id", "user_other_id"], name: "index_conversations_on_user_one_id_and_user_other_id", unique: true, using: :btree
+  end
+
+  create_table "messages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.text     "body",            limit: 65535
+    t.integer  "sender_id"
+    t.integer  "conversation_id"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id", using: :btree
+    t.index ["sender_id"], name: "index_messages_on_sender_id", using: :btree
+  end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email",                  default: "", null: false
