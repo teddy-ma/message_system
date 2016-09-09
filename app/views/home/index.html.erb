@@ -1,2 +1,16 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<div class="row">
+  <%= form_tag(contacts_path, method: :post) do %>
+    <%= text_field_tag :email %>
+    <%= submit_tag "添加联系人" %>
+  <% end %>
+
+  <ul>
+    <% @contacts.each do |contact| %>
+      <li id="contact_<%= contact.id %>">
+        <%= link_to contact.target_email, contact.conversation %> <!-- 还是冗余字段吧，不然寻找太麻烦 -->
+        <%= show_unread_count(contact.conversation) %>
+        <%= link_to "删除联系人", contact, method: :delete, remote: true, data: { confirm: "确认删除联系人？" } %>
+      </li>
+    <% end %>
+  </ul>
+</div>

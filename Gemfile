@@ -13,6 +13,8 @@ gem 'jbuilder', '~> 2.5'
 group :development, :test do
   gem 'pry-byebug'
   gem 'factory_girl_rails'
+  gem 'minitest-reporters'
+  gem 'mocha', require: false
 end
 
 group :development do
