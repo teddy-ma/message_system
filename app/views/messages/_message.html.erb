@@ -1,0 +1,12 @@
+<li style="list-style: none" id="message_<%= message.id %>">
+  <% if current_user.id == message.sender_id %>
+    <p style="text-align: right">
+      <%= sanitize message.body %>
+      <%= link_to "x", [message.conversation, message], method: :delete, remote: true, data: { confirm: "确认删除消息？" }%>
+    </p>
+  <% else %>
+    <p style="text-align: left">
+      <%= sanitize message.body %>
+    </p>
+  <% end %>
+</li>

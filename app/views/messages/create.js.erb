@@ -1,0 +1,4 @@
+// var new_message_html = '<li style="list-style: none"><p style="text-align: right"><%= sanitize @message.body %></p></li>';
+// $("#chat_list").append(new_message_html);
+$("#chat_list").append('<%= j render @message %>');
+$("#input-message-body").val('');
