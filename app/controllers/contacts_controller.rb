@@ -1,5 +1,9 @@
 class ContactsController < ApplicationController
 
+  def index
+    @contacts = current_user.contacts.order(last_touch_at: :desc).includes(:conversation)
+  end
+
   def create
     target_user = User.where(email: params[:email]).first
     return redirect_to root_url, alert: "用户不存在" unless target_user
@@ -15,4 +19,8 @@ class ContactsController < ApplicationController
     return redirect_to root_url, alert: "联系人创建成功"
   end
 
+  def destroy
+    @contact = current_user.contacts.find(params[:id])
+    @contact.destroy
+  end
 end

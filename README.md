@@ -1,24 +1,43 @@
-# README
+#  英语流利说笔试设计思路
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+整个系统粗看并不困难，不过深入思考一下发现了如下难点：
 
-Things you may want to cover:
++ 删除联系人后，数据需要保留，再次添加联系人后数据要都在
++ 发送消息后，如果发送方不是接收方的联系人，那么要自动添加为联系人
 
-* Ruby version
+## 模型
 
-* System dependencies
+一开始我的设计是：在 message 表中记录 sender 和 receiver
 
-* Configuration
+| id  | body  | sender_id  | receiver_id  | created_at |
+|-----|-------|------------|--------------|------------|
 
-* Database creation
+这样的好处是，消息的存在不依赖于用户的关系，与联系人是否删除无关，再次添加联系人后数据依然都在。
+可问题是，要获取对话的两人的来往信息有点困难，虽然双方 ID 都有保存，但是读取后还需要根据创建时间排序，效率较低。
 
-* Database initialization
+一般这种情况，可以使用一个 conversation（会话）模型，来建立两个用户的关系，然后两人的消息都属于这个 conversation。这样查找两人的来往消息非常方便，而且 conversation 也可以负责保存未读消息数属性。
 
-* How to run the test suite
+可是涉及到删除联系人，这样的设计又有问题了，首先 conversation 是双方共有的，而题目要求是一方的删除不会影响另一方的联系人列表（我参考已经加了好友的微信设计）。也就是说，双方的联系人列表应该是分开保存的。
 
-* Services (job queues, cache servers, search engines, etc.)
+这样一来，我首先想到的是，把 conversation 的双方用户 id 字段严格控制，分为 from_id 和 to_id，用户删除自己的联系人相当于删除了 from_id 是自己的那个 conversation。可是这样一来，message 到底从属哪个 conversation 呢？就算可以把两个 conversation 的 id 都加上，可是删掉的 conversation 再恢复时，如何找回以前的 id 呢？这样肯定不行。
 
-* Deployment instructions
+最后我想到，再创建一个联系人模型 contact，用来关联用户和会话，一个用户有多个联系人，每个联系人关联一个会话。这样的设计就解耦了用户和会话，让每个用户可以操作自己的联系人而不影响其他用户。
 
-* ...
+所以，最后整个系统有 4 个模型：User, Conversation, Contact, Message
+
+PS1 由于 Conversation 需要两个外键都指向 User，为了方便查找与数据统一，我人为规定用户 ID 比较小的放在 one_user_id 字段，比较大的放在 other_user_id 字段。
+PS2 在 Contact 模型中，加入了 target_email 字段作为冗余数据，因为题目没有提到用户可以修改自己的 email，所以没做更新的处理。
+
+## 用例
+
+题目的说明挺清晰的，找出用例并不难
+
+大前提是用户需要登录。。。
+
+用例如下：
+
+1. 用户可以看到自己的联系人列表
+2. 用户可以添加联系人，如果该联系人不是第一次添加，则过往数据应该都在
+3. 用户可以删除联系人，但不影响过往信息以及对方的联系人列表
+4. 用户进入聊天界面，如果有未读消息则清空
+5. 用户可以给联系人发送消息，如果对方未加自己为联系人，则自动加，要给对方添加未读消息数提示
