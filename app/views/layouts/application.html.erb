@@ -1,14 +1,45 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>MessageSystem</title>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= javascript_include_tag 'application'  %>
+</head>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+      <%= link_to "私信系统", root_path, class: "navbar-brand" %>
+      <ul class="nav navbar-nav">
+        <% if user_signed_in? %>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)"><%= current_user.email %></a>
+        </li>
+        <li class="nav-item">
+          <%= link_to "登出", destroy_user_session_path, method: :delete, class: "nav-link" %>
+        </li>
+        <% end %>
+      </ul>
+    </nav>
 
-  <body>
-    <%= yield %>
-  </body>
+    <div class="container">
+
+      <div style="margin-top: 80px">
+
+        <% flash.each do |key, value| %>
+          <div class="alert alert-<%= key %> alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <%= value %>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </div>
+
+    </div>
+
+</body>
+
 </html>
