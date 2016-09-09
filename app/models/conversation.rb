@@ -14,6 +14,12 @@ class Conversation < ApplicationRecord
     user_one == from_user ? user_other : user_one
   end
 
+  def clear_unread_count(user_id)
+    if user_id != last_reply_user_id
+      update_attributes(unread_count: 0)
+    end
+  end
+
   def self.find_by_user_ids(one_id, other_id)
     small_id, big_id = [one_id, other_id].sort
     where(user_one_id: small_id, user_other_id: big_id).first
